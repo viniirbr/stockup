@@ -1,4 +1,3 @@
-import { Text } from "react-native";
 import { ItemToBuy } from "../../interfaces/ItemToBuy";
 import {
   CheckText,

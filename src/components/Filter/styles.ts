@@ -3,7 +3,7 @@ import styled from "styled-components/native";
 export const FilterContainer = styled.View`
   width: 100%;
   overflow-x: scroll;
-  margin-top: 100px;
+  margin-top: 30px;
   display: flex;
   flex-direction: row;
   gap: 10px;
