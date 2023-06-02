@@ -17,19 +17,9 @@ export default function Home({ navigation }: Props) {
   const [toBuyActive, setToBuyActive] = useState<boolean>(false);
 
   useEffect(() => {
-    async function fetchCategories() {
-      try {
-        const categories = await AsyncStorage.getItem("categories");
-        const categoriesObject: Category[] = JSON.parse(categories as string);
-        setFilters(filters);
-      } catch (error) {
-        console.log(error);
-      }
-    }
     async function fetchProducts() {
       try {
         const products = await AsyncStorage.getItem("products");
-        console.log("products", products);
         const productsObject: Product[] = JSON.parse(products as string);
         setProducts(productsObject);
       } catch (error) {
@@ -37,7 +27,6 @@ export default function Home({ navigation }: Props) {
       }
     }
     navigation.addListener("focus", () => {
-      fetchCategories();
       fetchProducts();
     });
 
@@ -73,22 +62,17 @@ export default function Home({ navigation }: Props) {
     }
   }
 
-  // function filterProductsByCategory(product: Product) {
-  //   if (filters.every((filter) => filter.selected === false)) {
-  //     return true;
-  //   }
+  function filterProductsByCategory(product: Product) {
+    if (filters.length === 0) {
+      return true;
+    }
 
-  //   if (
-  //     filters
-  //       .filter((filter) => filter.selected === true)
-  //       .map((filter) => filter.category.name)
-  //       .includes(product.category?.name as string)
-  //   ) {
-  //     return true;
-  //   }
+    if (filters.includes(product.category as string)) {
+      return true;
+    }
 
-  //   return false;
-  // }
+    return false;
+  }
 
   return (
     <View style={styles.container}>
@@ -103,9 +87,13 @@ export default function Home({ navigation }: Props) {
       <FlatList
         fadingEdgeLength={150}
         style={styles.flat}
-        data={products}
-        //.filter((item) => filterProductsByCategory(item))
-        //.filter((item) => item.checked === !toBuyActive)}
+        data={
+          toBuyActive
+            ? products
+                .filter((item) => item.checked === false)
+                .filter((item) => filterProductsByCategory(item))
+            : products.filter((item) => filterProductsByCategory(item))
+        }
         keyExtractor={(item) => item.name}
         renderItem={(product) => (
           <Card changeItemState={changeItemState} product={product.item} />

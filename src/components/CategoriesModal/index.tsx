@@ -80,8 +80,12 @@ export function CategoriesModal({
 function updateCategories(categories: Category[]) {
   try {
     if (categories.length === 0) return;
-    console.log("categories modal", categories);
-    AsyncStorage.setItem("categories", JSON.stringify(categories));
+    const categoriesDeselected = categories.map((category) => {
+      if (category.active) return category;
+
+      return { ...category, selected: false };
+    });
+    AsyncStorage.setItem("categories", JSON.stringify(categoriesDeselected));
   } catch (error) {
     console.log(error);
   }

@@ -20,7 +20,6 @@ interface FilterProps {
 export function Filter({ filters, handlePress, navigation }: FilterProps) {
   const [modalOpen, setModalOpen] = useState(false);
   const [categories, setCategories] = useState<Category[]>([]);
-  console.log(categories);
 
   useEffect(() => {
     async function loadCategories() {
