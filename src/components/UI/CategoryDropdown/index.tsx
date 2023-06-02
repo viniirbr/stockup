@@ -4,10 +4,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { Button } from "../Button";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { RootDrawerParamList } from "../../../../App";
-import {
-  DrawerNavigationProp,
-  DrawerScreenProps,
-} from "@react-navigation/drawer";
+import { DrawerNavigationProp } from "@react-navigation/drawer";
 
 interface Props {
   navigation: DrawerNavigationProp<
@@ -15,10 +12,11 @@ interface Props {
     "CreateProduct",
     undefined
   >;
+  value: string | null;
+  setValue: React.Dispatch<React.SetStateAction<string | null>>;
 }
 
-export function CategoryDropdown({ navigation }: Props) {
-  const [value, setValue] = useState(null);
+export function CategoryDropdown({ navigation, value, setValue }: Props) {
   const [open, setOpen] = useState(false);
   const [items, setItems] = useState<{ label: string; value: string }[]>([]);
 
@@ -33,19 +31,22 @@ export function CategoryDropdown({ navigation }: Props) {
           }[];
           setItems(
             categoriesObject.map((category) => ({
-              label: category.name.toUpperCase(),
+              label: category.name,
               value: category.name,
             }))
           );
         }
-        // console.log(JSON.parse(categories as string));
-        // if (categories) setItems(JSON.parse(categories));
-        // console.log(JSON.parse(categories as string));
       } catch (error) {
         console.log(error);
       }
     }
-    loadCategories();
+    function onFocus() {
+      navigation.addListener("focus", () => {
+        loadCategories();
+      });
+    }
+    onFocus();
+    return () => navigation.removeListener("focus", () => {});
   }, []);
 
   return (
@@ -59,6 +60,8 @@ export function CategoryDropdown({ navigation }: Props) {
           setValue={setValue}
           setItems={setItems}
           placeholder="Category"
+          zIndex={100}
+          listMode="MODAL"
         />
       </HorizontalView>
       <Button

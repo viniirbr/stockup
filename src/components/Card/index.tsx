@@ -1,9 +1,10 @@
-import { ItemToBuy } from "../../interfaces/ItemToBuy";
+import { useEffect, useState } from "react";
+import { Product } from "../../interfaces/Product";
 import {
   CheckText,
   CheckTouchable,
   Container,
-  VerticalView,
+  HoriontalView,
   PicPlaceHolder,
   PicView,
   PriceText,
@@ -14,42 +15,60 @@ import {
   CategoryView,
   CategoryText,
 } from "./styles";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { Category } from "../../interfaces/Category";
 
 interface Props {
-  itemToBuy: ItemToBuy;
-  changeItemState: (id: number) => void;
+  product: Product;
+  changeItemState: (name: string) => void;
 }
 
-export function Card({ itemToBuy, changeItemState }: Props) {
+export function Card({ product, changeItemState }: Props) {
+  const [category, setCategory] = useState<Category>();
+
+  useEffect(() => {
+    async function getCategoryInfo() {
+      try {
+        const categories = await AsyncStorage.getItem("categories");
+        const categoriesObject: Category[] = JSON.parse(categories as string);
+        setCategory(
+          categoriesObject.find(
+            (category) => category.name === product.category
+          )
+        );
+      } catch (error) {}
+    }
+    getCategoryInfo();
+  }, []);
   return (
     <Container>
       <PicView>
         <PicPlaceHolder />
       </PicView>
       <ViewInfo>
-        <VerticalView>
-          <Title>{itemToBuy.name}</Title>
-          <CategoryView color={itemToBuy.category?.color || "transparent"}>
-            <CategoryText style={{ color: "black" }}>
-              {itemToBuy.category?.name}
-            </CategoryText>
-          </CategoryView>
-          <PriceText>Last price: €{itemToBuy.lastPrice}</PriceText>
-        </VerticalView>
-        <VerticalView>
-          <QuantityText>x{itemToBuy.quantity}</QuantityText>
+        <HoriontalView>
+          <Title>{product.name}</Title>
+          {<QuantityText>x10{product.quantity}</QuantityText>}
+        </HoriontalView>
+        <CategoryView color={category?.color || "transparent"}>
+          <CategoryText style={{ color: "black" }}>
+            {category?.name}
+          </CategoryText>
+        </CategoryView>
+        <HoriontalView>
+          <PriceText>Last price: €{product.lastPrice}</PriceText>
           <CheckTouchable
             activeOpacity={0.7}
-            checked={itemToBuy.checked}
-            onPress={() => changeItemState(itemToBuy.id)}
+            checked={product.checked}
+            onPress={() => changeItemState(product.name)}
           >
-            {itemToBuy.checked ? (
+            {product.checked ? (
               <CheckText name="check" size={26} />
             ) : (
               <ShoppingText name="shopping-cart" size={26} />
             )}
           </CheckTouchable>
-        </VerticalView>
+        </HoriontalView>
       </ViewInfo>
     </Container>
   );

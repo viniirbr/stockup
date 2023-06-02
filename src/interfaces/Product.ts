@@ -1,10 +1,9 @@
 import { Category } from "./Category";
 
-export interface ItemToBuy {
-  id: number;
+export interface Product {
   name: string;
   quantity?: number;
-  category?: Category;
+  category?: string;
   lastPrice?: number;
   checked: boolean;
 }

@@ -8,6 +8,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { DrawerNavigationProp } from "@react-navigation/drawer";
 import { RootDrawerParamList } from "../../../App";
 import { RouteProp } from "@react-navigation/native";
+import { Category } from "../../interfaces/Category";
 
 interface Props {
   navigation: DrawerNavigationProp<
@@ -19,7 +20,6 @@ interface Props {
 }
 
 export function CreateCategoryForm({ route, navigation }: Props) {
-  console.log(navigation.getState().history);
   const [name, setName] = useState("");
   const [color, setColor] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -29,31 +29,26 @@ export function CreateCategoryForm({ route, navigation }: Props) {
       setLoading(true);
       const categories = await AsyncStorage.getItem("categories");
       if (categories) {
-        const categoriesObject = JSON.parse(categories) as {
-          name: string;
-          color: string;
-        }[];
+        const categoriesObject = JSON.parse(categories) as Category[];
         const categoryFound = categoriesObject.find(
           (category) => category.name === name
         );
-
         if (categoryFound) {
           console.log("Category already exists");
           return;
         }
-
         await AsyncStorage.setItem(
           "categories",
-          JSON.stringify([...categoriesObject, { name, color }])
+          JSON.stringify([...categoriesObject, { name, color, active: true }])
         );
       } else {
         await AsyncStorage.setItem(
           "categories",
-          JSON.stringify([{ name, color }])
+          JSON.stringify([{ name, color, active: true }])
         );
       }
-      const result = await AsyncStorage.getItem("categories");
-      console.log(result);
+      await AsyncStorage.getItem("categories");
+      navigation.goBack();
     } catch (error) {
       console.log(error);
     } finally {

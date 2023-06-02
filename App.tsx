@@ -17,7 +17,11 @@ export default function App() {
   return (
     <>
       <NavigationContainer>
-        <Drawer.Navigator useLegacyImplementation={true}>
+        <Drawer.Navigator
+          useLegacyImplementation={true}
+          initialRouteName="Home"
+          backBehavior="history"
+        >
           <Drawer.Screen name="Home" component={Home} />
           <Drawer.Screen
             name="CreateProduct"

@@ -1,158 +1,116 @@
 import { StatusBar } from "expo-status-bar";
-import { FlatList, StyleSheet, View } from "react-native";
+import { FlatList, StyleSheet, Text, View } from "react-native";
 import { Card } from "../components/Card";
-import { ItemToBuy } from "../interfaces/ItemToBuy";
-import { useState } from "react";
-import { Filter } from "../components/Filter";
+import { Product } from "../interfaces/Product";
+import { useState, useEffect } from "react";
+import { Filter, ToBuyButton } from "../components/Filter";
 import { Category } from "../interfaces/Category";
+import { DrawerScreenProps } from "@react-navigation/drawer";
+import { RootDrawerParamList } from "../../App";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
-const itemsToBuy: ItemToBuy[] = [
-  {
-    id: 1,
-    name: "Milk",
-    quantity: 1,
-    lastPrice: 1.5,
-    checked: true,
-    category: {
-      id: 3,
-      name: "Dairy",
-      color: "red",
-    },
-  },
-  {
-    id: 2,
-    name: "Bread",
-    quantity: 2,
-    lastPrice: 1.2,
-    checked: true,
-  },
-  {
-    id: 3,
-    name: "Butter",
-    quantity: 1,
-    lastPrice: 2.5,
-    checked: true,
-    category: {
-      id: 3,
-      name: "Dairy",
-      color: "red",
-    },
-  },
-  {
-    id: 4,
-    name: "Eggs",
-    quantity: 12,
-    lastPrice: 3.5,
-    checked: true,
-  },
-  {
-    id: 5,
-    name: "Cheese",
-    quantity: 1,
-    lastPrice: 2.5,
-    checked: true,
-    category: {
-      id: 3,
-      name: "Dairy",
-      color: "red",
-    },
-  },
-  {
-    id: 6,
-    name: "Ham",
-    quantity: 1,
-    lastPrice: 2.5,
-    checked: true,
-  },
-  {
-    id: 7,
-    name: "Water",
-    quantity: 6,
-    lastPrice: 1.5,
-    checked: true,
-    category: {
-      id: 2,
-      name: "Veggie",
-      color: "green",
-    },
-  },
-  {
-    id: 8,
-    name: "Coke",
-    quantity: 2,
-    lastPrice: 1.5,
-    checked: true,
-  },
-];
+type Props = DrawerScreenProps<RootDrawerParamList, "Home">;
 
-export default function Home() {
-  const [items, setItems] = useState<ItemToBuy[]>(itemsToBuy);
-  const [filters, setFilters] = useState<
-    { category: Category; active: boolean }[]
-  >([
-    { category: { id: 2, name: "Veggie", color: "green" }, active: false },
-    { category: { id: 3, name: "Dairy", color: "red" }, active: false },
-  ]);
+export default function Home({ navigation }: Props) {
+  const [products, setProducts] = useState<Product[]>([]);
+  const [filters, setFilters] = useState<string[]>([]);
   const [toBuyActive, setToBuyActive] = useState<boolean>(false);
 
-  function addFilter(id: number) {
-    if (id === 1) {
-      setToBuyActive(!toBuyActive);
-      return;
-    }
-    const newFilters = filters.map((filter) => {
-      if (filter.category.id === id) {
-        filter.active = !filter.active;
+  useEffect(() => {
+    async function fetchCategories() {
+      try {
+        const categories = await AsyncStorage.getItem("categories");
+        const categoriesObject: Category[] = JSON.parse(categories as string);
+        setFilters(filters);
+      } catch (error) {
+        console.log(error);
       }
-      return filter;
-    });
-    setFilters(newFilters);
-  }
-
-  function changeItemState(id: number) {
-    const newItems = items.map((item) => {
-      if (item.id === id) {
-        item.checked = !item.checked;
+    }
+    async function fetchProducts() {
+      try {
+        const products = await AsyncStorage.getItem("products");
+        console.log("products", products);
+        const productsObject: Product[] = JSON.parse(products as string);
+        setProducts(productsObject);
+      } catch (error) {
+        console.log(error);
       }
-      return item;
+    }
+    navigation.addListener("focus", () => {
+      fetchCategories();
+      fetchProducts();
     });
-    setItems(newItems);
+
+    return () => navigation.removeListener("focus", () => {});
+  }, []);
+
+  function toggleFilter(name: string) {
+    setFilters((prev) => {
+      if (prev.includes(name)) {
+        return prev.filter((filter) => filter !== name);
+      }
+      return [...prev, name];
+    });
   }
 
-  function filterItemsByCategory(itemToBuy: ItemToBuy) {
-    if (filters.every((filter) => filter.active === false)) {
-      return true;
-    }
+  async function changeItemState(name: string) {
+    const newProducts = products.map((product) => {
+      if (
+        product.name.localeCompare(name, undefined, {
+          sensitivity: "accent",
+        }) === 0
+      ) {
+        product.checked = !product.checked;
+      }
 
-    if (
-      filters
-        .filter((filter) => filter.active === true)
-        .map((filter) => filter.category.id)
-        .includes(itemToBuy.category?.id as number)
-    ) {
-      return true;
+      return product;
+    });
+    setProducts(newProducts);
+    try {
+      await AsyncStorage.setItem("products", JSON.stringify(newProducts));
+    } catch (error) {
+      console.log(error);
     }
-
-    return false;
   }
+
+  // function filterProductsByCategory(product: Product) {
+  //   if (filters.every((filter) => filter.selected === false)) {
+  //     return true;
+  //   }
+
+  //   if (
+  //     filters
+  //       .filter((filter) => filter.selected === true)
+  //       .map((filter) => filter.category.name)
+  //       .includes(product.category?.name as string)
+  //   ) {
+  //     return true;
+  //   }
+
+  //   return false;
+  // }
 
   return (
     <View style={styles.container}>
-      <Filter
-        categories={filters}
-        handlePress={addFilter}
-        toBuyActive={toBuyActive}
-      />
+      <View style={styles.filterContainer}>
+        <ToBuyButton toBuyActive={toBuyActive} setActive={setToBuyActive} />
+        <Filter
+          handlePress={toggleFilter}
+          filters={filters}
+          navigation={navigation}
+        />
+      </View>
       <FlatList
         fadingEdgeLength={150}
         style={styles.flat}
-        data={itemsToBuy
-          .filter((item) => filterItemsByCategory(item))
-          .filter((item) => item.checked === !toBuyActive)}
-        keyExtractor={(item) => item.id.toString()}
-        renderItem={(itemToBuy) => (
-          <Card changeItemState={changeItemState} itemToBuy={itemToBuy.item} />
+        data={products}
+        //.filter((item) => filterProductsByCategory(item))
+        //.filter((item) => item.checked === !toBuyActive)}
+        keyExtractor={(item) => item.name}
+        renderItem={(product) => (
+          <Card changeItemState={changeItemState} product={product.item} />
         )}
+        ListEmptyComponent={() => <Text>Nothing to show</Text>}
       />
       <StatusBar style="auto" />
     </View>
@@ -169,5 +127,11 @@ const styles = StyleSheet.create({
   },
   flat: {
     marginTop: 20,
+  },
+  filterContainer: {
+    height: 140,
+    marginTop: 30,
+    paddingHorizontal: 5,
+    width: "100%",
   },
 });

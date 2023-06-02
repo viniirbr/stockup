@@ -1,9 +1,9 @@
 import styled from "styled-components/native";
 
-export const FilterContainer = styled.View`
+export const FilterContainer = styled.ScrollView`
   width: 100%;
+  align-items: center;
   overflow-x: scroll;
-  margin-top: 30px;
   display: flex;
   flex-direction: row;
   gap: 10px;
@@ -22,8 +22,18 @@ export const FilterTouchable = styled.TouchableOpacity<FilterTouchableProps>`
   background: ${(props) => (props.active ? props.color : "#fff")};
 `;
 
+export const ToBuyTouchable = styled(FilterTouchable)`
+  margin-right: 20px;
+  border-radius: 10px;
+  border-bottom-width: 8px;
+`;
+
 export const FilterText = styled.Text`
   font-size: 18px;
   font-weight: bold;
   text-align: center;
+`;
+
+export const ToBuyText = styled(FilterText)`
+  font-size: 22px;
 `;

@@ -10,6 +10,11 @@ interface Props {
 export function ColorDropdown({ value, setValue }: Props) {
   const [open, setOpen] = useState(false);
   const [items, setItems] = useState([
+    { label: "Gray ", value: "#F1F1EF" },
+    { label: "Brown ", value: "#F3EEEE" },
+    { label: "Orange ", value: "#F8ECDF" },
+    { label: "Yellow ", value: "#FAF3DD" },
+    { label: "Green ", value: "#EEF3ED" },
     { label: "Blue", value: "#E9F3F7" },
     { label: "Purple", value: "#F6F3F8" },
     { label: "Pink", value: "#F9F2F5" },
@@ -39,6 +44,7 @@ export function ColorDropdown({ value, setValue }: Props) {
       setOpen={setOpen}
       placeholder="color"
       style={{ width: "100%", borderColor: value || "#000" }}
+      listMode="MODAL"
     />
   );
 }

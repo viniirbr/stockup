@@ -28,13 +28,13 @@ export const ViewInfo = styled.View`
   width: 76%;
   height: 100%;
   display: flex;
-  flex-direction: row;
   justify-content: space-between;
 `;
 
-export const VerticalView = styled.View`
+export const HoriontalView = styled.View`
   display: flex;
   justify-content: space-between;
+  flex-direction: row;
 `;
 
 export const Title = styled.Text`
@@ -53,7 +53,7 @@ interface CategoryProps {
 export const CategoryView = styled.View<CategoryProps>`
   background: ${({ color }) => color};
   border-radius: 5px;
-  width: 50%;
+  width: 20%;
   padding: 4px;
 `;
 
@@ -75,6 +75,9 @@ export const CheckTouchable = styled.TouchableOpacity<CheckProps>`
   background: ${({ checked }) => (checked ? "#ddffbb" : "#FA9884")};
   padding: 6px;
   border-radius: 100px;
+  position: absolute;
+  bottom: 2px;
+  right: 2px;
 `;
 
 export const CheckText = styled(Feather)`
