@@ -7,16 +7,23 @@ import {
   HoriontalView,
   PicPlaceHolder,
   PicView,
-  PriceText,
   QuantityText,
   ShoppingText,
   Title,
   ViewInfo,
   CategoryView,
   CategoryText,
+  PriceContainer,
+  PriceTitleText,
+  PriceValueText,
+  PriceValueContainer,
 } from "./styles";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Category } from "../../interfaces/Category";
+import { TouchableOpacity, View } from "react-native";
+import { Text } from "react-native";
+import { EditQuantityModal } from "./EditQuantityModal";
+import { EditLastPriceModal } from "./EditLastPriceModal";
 
 interface Props {
   product: Product;
@@ -25,6 +32,10 @@ interface Props {
 
 export function Card({ product, changeItemState }: Props) {
   const [category, setCategory] = useState<Category>();
+  const [editingQuantity, setEditingQuantity] = useState<boolean>(false);
+  const [editingLastPrice, setEditingLastPrice] = useState<boolean>(false);
+  const [quantity, setQuantity] = useState(product.quantity || 1);
+  const [price, setPrice] = useState(product.lastPrice || 0);
 
   useEffect(() => {
     async function getCategoryInfo() {
@@ -40,15 +51,25 @@ export function Card({ product, changeItemState }: Props) {
     }
     getCategoryInfo();
   }, []);
+
   return (
     <Container>
       <PicView>
-        <PicPlaceHolder />
+        <PicPlaceHolder style={{ backgroundColor: category?.color }} />
       </PicView>
       <ViewInfo>
         <HoriontalView>
           <Title>{product.name}</Title>
-          {<QuantityText>x10{product.quantity}</QuantityText>}
+          {!product.checked && (
+            <TouchableOpacity
+              activeOpacity={0.7}
+              onPress={() => setEditingQuantity(true)}
+            >
+              <QuantityText>
+                {quantity ? `x${quantity}` : "Add quantity"}
+              </QuantityText>
+            </TouchableOpacity>
+          )}
         </HoriontalView>
         <CategoryView color={category?.color || "transparent"}>
           <CategoryText style={{ color: "black" }}>
@@ -56,7 +77,25 @@ export function Card({ product, changeItemState }: Props) {
           </CategoryText>
         </CategoryView>
         <HoriontalView>
-          <PriceText>Last price: €{product.lastPrice}</PriceText>
+          <PriceContainer>
+            <PriceTitleText>Last price: </PriceTitleText>
+            <PriceValueContainer
+              activeOpacity={0.7}
+              onPress={() => setEditingLastPrice(true)}
+              style={{
+                shadowColor: "#000",
+                shadowOffset: {
+                  width: 0,
+                  height: 2,
+                },
+                shadowOpacity: 0.25,
+                shadowRadius: 4,
+                elevation: 5,
+              }}
+            >
+              <PriceValueText>€{price}</PriceValueText>
+            </PriceValueContainer>
+          </PriceContainer>
           <CheckTouchable
             activeOpacity={0.7}
             checked={product.checked}
@@ -70,6 +109,22 @@ export function Card({ product, changeItemState }: Props) {
           </CheckTouchable>
         </HoriontalView>
       </ViewInfo>
+
+      <EditQuantityModal
+        product={product}
+        close={() => setEditingQuantity(false)}
+        visible={editingQuantity}
+        quantity={quantity}
+        setQuantity={setQuantity}
+      />
+
+      <EditLastPriceModal
+        product={product}
+        close={() => setEditingLastPrice(false)}
+        visible={editingLastPrice}
+        price={price}
+        setPrice={setPrice}
+      />
     </Container>
   );
 }

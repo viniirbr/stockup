@@ -21,7 +21,9 @@ export default function Home({ navigation }: Props) {
       try {
         const products = await AsyncStorage.getItem("products");
         const productsObject: Product[] = JSON.parse(products as string);
-        setProducts(productsObject);
+        if (productsObject) {
+          setProducts(productsObject);
+        }
       } catch (error) {
         console.log(error);
       }

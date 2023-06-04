@@ -9,7 +9,7 @@ export const Container = styled.View`
   align-items: center;
   justify-content: space-between;
   padding: 10px;
-  height: 100px;
+  height: 110px;
   margin-bottom: 14px;
 `;
 
@@ -35,6 +35,7 @@ export const HoriontalView = styled.View`
   display: flex;
   justify-content: space-between;
   flex-direction: row;
+  padding-right: 10px;
 `;
 
 export const Title = styled.Text`
@@ -62,9 +63,25 @@ export const CategoryText = styled.Text`
   font-weight: bold;
 `;
 
-export const PriceText = styled.Text`
+export const PriceContainer = styled.View`
+  flex-direction: row;
+  align-items: center;
+`;
+
+export const PriceTitleText = styled.Text`
   font-size: 18px;
   font-weight: bold;
+`;
+
+export const PriceValueContainer = styled.TouchableOpacity`
+  background: #ccc;
+  padding: 5px;
+  border-radius: 5px;
+`;
+
+export const PriceValueText = styled.Text`
+  font-weight: bold;
+  font-size: 16px;
 `;
 
 interface CheckProps {

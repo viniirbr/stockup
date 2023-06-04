@@ -26,7 +26,7 @@ export function Button({
   ...props
 }: Props) {
   return (
-    <TouchableContainer {...props} style={style}>
+    <TouchableContainer {...props} style={style} activeOpacity={0.7}>
       {loading ? (
         <ActivityIndicator size={32} color="white" />
       ) : (

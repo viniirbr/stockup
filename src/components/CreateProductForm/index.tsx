@@ -37,8 +37,6 @@ export function CreateProductForm({ navigation }: Props) {
           console.log("Product already exists");
           return;
         }
-        console.log("creating", productsObject);
-        console.log("info", name);
         await AsyncStorage.setItem(
           "products",
           JSON.stringify([
@@ -47,10 +45,9 @@ export function CreateProductForm({ navigation }: Props) {
           ])
         );
       } else {
-        console.log("else");
         await AsyncStorage.setItem(
           "products",
-          JSON.stringify([{ name, lastPrice, category }])
+          JSON.stringify([{ name, lastPrice, category, checked: false }])
         );
       }
       await AsyncStorage.getItem("products");
