@@ -1,11 +1,15 @@
-import { Category } from "../../../interfaces/Category";
+import { DrawerNavigationProp } from "@react-navigation/drawer";
+import { Category } from "../../../shared/interfaces/Category";
 import { Button } from "../Button";
+import { RootDrawerParamList } from "../../../../App";
 
 interface Props {
   category: Category;
   active?: boolean;
   selected?: boolean;
-  onPress: (category: string) => void;
+  onPress: (categoryId: string | number) => void;
+  onLongPress?: () => void;
+  navigation?: DrawerNavigationProp<RootDrawerParamList, "Home", undefined>;
 }
 
 export function FilterButton({
@@ -13,6 +17,7 @@ export function FilterButton({
   active = true,
   selected = false,
   onPress,
+  navigation,
 }: Props) {
   return (
     <Button
@@ -30,12 +35,10 @@ export function FilterButton({
         width: "100%",
       }}
       textStyle={{ fontSize: 18, textAlign: "center", fontWeight: "bold" }}
-      onPress={() => onPress(category.name)}
+      onPress={() => onPress(category.id)}
+      onLongPress={() =>
+        navigation && navigation.navigate("CreateCategory", { category })
+      }
     />
   );
 }
-
-/*padding: 5px 10px;
-  border: solid 2px #000;
-  border-radius: 100px;
-  max-width: 100px;*/

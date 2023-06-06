@@ -1,7 +1,7 @@
 import styled from "styled-components/native";
 import { Feather } from "@expo/vector-icons";
 
-export const Container = styled.View`
+export const Container = styled.TouchableOpacity`
   border: solid 2px #000;
   border-radius: 10px;
   display: flex;

@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import { Product } from "../../interfaces/Product";
+import { useEffect, useState, useContext } from "react";
+import { Product } from "../../shared/interfaces/Product";
 import {
   CheckText,
   CheckTouchable,
@@ -19,41 +19,38 @@ import {
   PriceValueContainer,
 } from "./styles";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { Category } from "../../interfaces/Category";
-import { TouchableOpacity, View } from "react-native";
-import { Text } from "react-native";
+import { Category } from "../../shared/interfaces/Category";
+import { TouchableOpacity } from "react-native";
 import { EditQuantityModal } from "./EditQuantityModal";
 import { EditLastPriceModal } from "./EditLastPriceModal";
+import { OptionsModal } from "./OptionsModal";
+import { DrawerNavigationProp } from "@react-navigation/drawer";
+import { RootDrawerParamList } from "../../../App";
+import { ProductsContext } from "../../contexts/ProductsContext";
 
 interface Props {
   product: Product;
-  changeItemState: (name: string) => void;
+  navigation: DrawerNavigationProp<RootDrawerParamList, "Home", undefined>;
 }
 
-export function Card({ product, changeItemState }: Props) {
-  const [category, setCategory] = useState<Category>();
+export function Card({ product, navigation }: Props) {
   const [editingQuantity, setEditingQuantity] = useState<boolean>(false);
   const [editingLastPrice, setEditingLastPrice] = useState<boolean>(false);
   const [quantity, setQuantity] = useState(product.quantity || 1);
-  const [price, setPrice] = useState(product.lastPrice || 0);
+  const [price, setPrice] = useState(product.lastPrice?.toString() || "0");
+  const [optionsModalVisible, setOptionsModalVisible] =
+    useState<boolean>(false);
 
-  useEffect(() => {
-    async function getCategoryInfo() {
-      try {
-        const categories = await AsyncStorage.getItem("categories");
-        const categoriesObject: Category[] = JSON.parse(categories as string);
-        setCategory(
-          categoriesObject.find(
-            (category) => category.name === product.category
-          )
-        );
-      } catch (error) {}
-    }
-    getCategoryInfo();
-  }, []);
+  const { toggleProductState, categories } = useContext(ProductsContext);
+  const category = categories.find(
+    (category) => category.name === product.category
+  );
 
   return (
-    <Container>
+    <Container
+      activeOpacity={0.7}
+      onLongPress={() => setOptionsModalVisible(true)}
+    >
       <PicView>
         <PicPlaceHolder style={{ backgroundColor: category?.color }} />
       </PicView>
@@ -99,7 +96,7 @@ export function Card({ product, changeItemState }: Props) {
           <CheckTouchable
             activeOpacity={0.7}
             checked={product.checked}
-            onPress={() => changeItemState(product.name)}
+            onPress={() => toggleProductState(product.id)}
           >
             {product.checked ? (
               <CheckText name="check" size={26} />
@@ -124,6 +121,15 @@ export function Card({ product, changeItemState }: Props) {
         visible={editingLastPrice}
         price={price}
         setPrice={setPrice}
+      />
+
+      <OptionsModal
+        product={product}
+        close={() => setOptionsModalVisible(false)}
+        visible={optionsModalVisible}
+        price={price}
+        setPrice={setPrice}
+        navigation={navigation}
       />
     </Container>
   );

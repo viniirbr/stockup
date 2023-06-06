@@ -1,39 +1,29 @@
 import { StatusBar } from "expo-status-bar";
 import { FlatList, StyleSheet, Text, View } from "react-native";
 import { Card } from "../components/Card";
-import { Product } from "../interfaces/Product";
+import { Product } from "../shared/interfaces/Product";
 import { useState, useEffect } from "react";
 import { Filter, ToBuyButton } from "../components/Filter";
-import { Category } from "../interfaces/Category";
 import { DrawerScreenProps } from "@react-navigation/drawer";
 import { RootDrawerParamList } from "../../App";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import { ProductsContext } from "../contexts/ProductsContext";
+import { useContext } from "react";
 
 type Props = DrawerScreenProps<RootDrawerParamList, "Home">;
 
 export default function Home({ navigation }: Props) {
-  const [products, setProducts] = useState<Product[]>([]);
+  const { products, updateProducts, deleteProduct } =
+    useContext(ProductsContext);
   const [filters, setFilters] = useState<string[]>([]);
   const [toBuyActive, setToBuyActive] = useState<boolean>(false);
 
   useEffect(() => {
-    async function fetchProducts() {
-      try {
-        const products = await AsyncStorage.getItem("products");
-        const productsObject: Product[] = JSON.parse(products as string);
-        if (productsObject) {
-          setProducts(productsObject);
-        }
-      } catch (error) {
-        console.log(error);
-      }
-    }
-    navigation.addListener("focus", () => {
-      fetchProducts();
+    const unsubscribe = navigation.addListener("focus", () => {
+      updateProducts();
     });
 
-    return () => navigation.removeListener("focus", () => {});
-  }, []);
+    return unsubscribe;
+  }, [navigation]);
 
   function toggleFilter(name: string) {
     setFilters((prev) => {
@@ -42,26 +32,6 @@ export default function Home({ navigation }: Props) {
       }
       return [...prev, name];
     });
-  }
-
-  async function changeItemState(name: string) {
-    const newProducts = products.map((product) => {
-      if (
-        product.name.localeCompare(name, undefined, {
-          sensitivity: "accent",
-        }) === 0
-      ) {
-        product.checked = !product.checked;
-      }
-
-      return product;
-    });
-    setProducts(newProducts);
-    try {
-      await AsyncStorage.setItem("products", JSON.stringify(newProducts));
-    } catch (error) {
-      console.log(error);
-    }
   }
 
   function filterProductsByCategory(product: Product) {
@@ -96,9 +66,9 @@ export default function Home({ navigation }: Props) {
                 .filter((item) => filterProductsByCategory(item))
             : products.filter((item) => filterProductsByCategory(item))
         }
-        keyExtractor={(item) => item.name}
+        keyExtractor={(item) => item.id.toString()}
         renderItem={(product) => (
-          <Card changeItemState={changeItemState} product={product.item} />
+          <Card product={product.item} navigation={navigation} />
         )}
         ListEmptyComponent={() => <Text>Nothing to show</Text>}
       />

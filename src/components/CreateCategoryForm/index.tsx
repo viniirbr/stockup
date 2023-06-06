@@ -3,12 +3,12 @@ import { Container, HorizontalView } from "./styles";
 import { Button } from "../UI/Button";
 import { ColorDropdown } from "../ColorsDropdown";
 import { View } from "react-native";
-import { useState } from "react";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useState, useContext, useEffect } from "react";
 import { DrawerNavigationProp } from "@react-navigation/drawer";
 import { RootDrawerParamList } from "../../../App";
 import { RouteProp } from "@react-navigation/native";
-import { Category } from "../../interfaces/Category";
+import { Category } from "../../shared/interfaces/Category";
+import { ProductsContext } from "../../contexts/ProductsContext";
 
 interface Props {
   navigation: DrawerNavigationProp<
@@ -21,34 +21,52 @@ interface Props {
 
 export function CreateCategoryForm({ route, navigation }: Props) {
   const [name, setName] = useState("");
-  const [color, setColor] = useState(null);
+  const [color, setColor] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const { addCategory, editCategory } = useContext(ProductsContext);
 
-  async function onSubmit() {
+  useEffect(() => {
+    const unsubscribeFocus = navigation.addListener("focus", () => {
+      setName(route.params?.category?.name || "");
+      setColor(route.params?.category?.color || null);
+    });
+
+    const unsubscribeBlur = navigation.addListener("blur", () => {
+      navigation.setParams({ category: undefined });
+      setName(route.params?.category?.name || "");
+      setColor(route.params?.category?.color || null);
+    });
+
+    return () => {
+      unsubscribeFocus();
+      unsubscribeBlur();
+    };
+  }, [route, navigation]);
+
+  async function handleSave() {
     try {
       setLoading(true);
-      const categories = await AsyncStorage.getItem("categories");
-      if (categories) {
-        const categoriesObject = JSON.parse(categories) as Category[];
-        const categoryFound = categoriesObject.find(
-          (category) => category.name === name
-        );
-        if (categoryFound) {
-          console.log("Category already exists");
-          return;
-        }
-        await AsyncStorage.setItem(
-          "categories",
-          JSON.stringify([...categoriesObject, { name, color, active: true }])
-        );
+      if (!name || !color) throw new Error("Missing fields");
+      if (!route.params?.category.id) {
+        const category: Category = {
+          id: (Math.random() * 2000).toFixed(0),
+          name,
+          color,
+          active: true,
+        };
+        await addCategory(category);
       } else {
-        await AsyncStorage.setItem(
-          "categories",
-          JSON.stringify([{ name, color, active: true }])
-        );
+        const category: Category = {
+          id: route.params?.category.id,
+          name,
+          color,
+          active: true,
+        };
+        await editCategory(category);
       }
-      await AsyncStorage.getItem("categories");
-      navigation.goBack();
+      setName("");
+      setColor(null);
+      navigation.navigate("Home");
     } catch (error) {
       console.log(error);
     } finally {
@@ -74,7 +92,7 @@ export function CreateCategoryForm({ route, navigation }: Props) {
         text="Save"
         style={{ backgroundColor: "#A0D8B3", marginTop: 200 }}
         activeOpacity={0.7}
-        onPress={onSubmit}
+        onPress={handleSave}
         loading={loading}
       />
     </Container>

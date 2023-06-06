@@ -1,9 +1,8 @@
-import { Category } from "./Category";
-
 export interface Product {
+  id: number | string;
   name: string;
   quantity?: number;
-  category?: string;
+  category: string;
   lastPrice?: number;
   checked: boolean;
 }

@@ -3,7 +3,7 @@ import { ModalContainer } from "../../UI/Modal";
 import { InputContainer, QuantityInput } from "./styles";
 import { Button } from "../../UI/Button";
 import { Ionicons } from "@expo/vector-icons";
-import { Product } from "../../../interfaces/Product";
+import { Product } from "../../../shared/interfaces/Product";
 import { useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 

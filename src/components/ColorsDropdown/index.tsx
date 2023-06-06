@@ -4,7 +4,7 @@ import { useState } from "react";
 
 interface Props {
   value: string | null;
-  setValue: React.Dispatch<React.SetStateAction<null>>;
+  setValue: React.Dispatch<React.SetStateAction<null | string>>;
 }
 
 export function ColorDropdown({ value, setValue }: Props) {

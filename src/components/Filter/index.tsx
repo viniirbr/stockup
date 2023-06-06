@@ -1,15 +1,14 @@
 import { DrawerNavigationProp } from "@react-navigation/drawer";
 import { RootDrawerParamList } from "../../../App";
-import { Category } from "../../interfaces/Category";
 import { CategoriesModal } from "../CategoriesModal";
 import { Button } from "../UI/Button";
 import { ToBuyText, ToBuyTouchable } from "./styles";
 import { Ionicons } from "@expo/vector-icons";
-import { useState, useEffect } from "react";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useState, useEffect, useContext } from "react";
 import { FilterButton } from "../UI/FilterButton";
 import { ScrollView } from "react-native";
 import { View } from "react-native";
+import { ProductsContext } from "../../contexts/ProductsContext";
 
 interface FilterProps {
   filters: string[];
@@ -19,28 +18,15 @@ interface FilterProps {
 
 export function Filter({ filters, handlePress, navigation }: FilterProps) {
   const [modalOpen, setModalOpen] = useState(false);
-  const [categories, setCategories] = useState<Category[]>([]);
+  const { categories } = useContext(ProductsContext);
 
   useEffect(() => {
-    async function loadCategories() {
-      try {
-        const categories = await AsyncStorage.getItem("categories");
-        if (categories) {
-          const categoriesObject = JSON.parse(
-            categories as string
-          ) as Category[];
+    const unsubscribe = navigation.addListener("blur", () => {
+      setModalOpen(false);
+    });
 
-          const activeCategories = categoriesObject.filter(
-            (category) => category.active === true
-          );
-          setCategories(activeCategories);
-        }
-      } catch (error) {
-        console.log(error);
-      }
-    }
-    loadCategories();
-  }, [modalOpen]);
+    return unsubscribe;
+  }, [navigation]);
 
   return (
     <View style={{ flex: 1 }}>
@@ -50,19 +36,21 @@ export function Filter({ filters, handlePress, navigation }: FilterProps) {
           alignItems: "center",
           gap: 10,
           flexGrow: 1,
-          width: `${categories.length * 35}%`,
+          width: `${categories.length * 28}%`,
         }}
         horizontal
         scrollEnabled
       >
-        {categories.map((category) => (
-          <FilterButton
-            key={category.name}
-            category={category}
-            onPress={() => handlePress(category.name)}
-            selected={filters?.includes(category.name)}
-          />
-        ))}
+        {categories
+          .filter((category) => category.active === true)
+          .map((category) => (
+            <FilterButton
+              key={category.name}
+              category={category}
+              onPress={() => handlePress(category.name)}
+              selected={filters?.includes(category.name)}
+            />
+          ))}
         <Button
           activeOpacity={0.7}
           style={{

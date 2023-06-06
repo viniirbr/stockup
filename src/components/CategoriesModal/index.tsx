@@ -1,18 +1,12 @@
-import { ModalProps, Text } from "react-native";
-import {
-  CategoriesContainer,
-  FilterTouchable,
-  ModalContainer,
-  ModalTitle,
-} from "./styles";
+import { ModalProps } from "react-native";
+import { CategoriesContainer, ModalContainer, ModalTitle } from "./styles";
 import { Button } from "../UI/Button";
 import { Ionicons } from "@expo/vector-icons";
-import { useEffect, useState } from "react";
+import { useContext } from "react";
 import { DrawerNavigationProp } from "@react-navigation/drawer";
 import { RootDrawerParamList } from "../../../App";
-import { Category } from "../../interfaces/Category";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { FilterButton } from "../UI/FilterButton";
+import { ProductsContext } from "../../contexts/ProductsContext";
 
 interface Props extends ModalProps {
   setModalVisible: React.Dispatch<React.SetStateAction<boolean>>;
@@ -24,34 +18,11 @@ export function CategoriesModal({
   navigation,
   ...props
 }: Props) {
-  const [categories, setCategories] = useState<Category[]>([]);
+  const { categories, toggleCategoryActivate } = useContext(ProductsContext);
 
-  function handlePress(categoryName: string) {
-    const categoryIndex = categories.findIndex(
-      (category) => category.name === categoryName
-    );
-    const newCategories = [...categories];
-    newCategories[categoryIndex].active = !newCategories[categoryIndex].active;
-    setCategories(newCategories);
-    updateCategories(newCategories);
+  async function handlePress(categoryId: string | number) {
+    await toggleCategoryActivate(categoryId);
   }
-
-  useEffect(() => {
-    async function loadCategories() {
-      try {
-        const categoriesStored = await AsyncStorage.getItem("categories");
-        if (categories) {
-          const categoriesObject = JSON.parse(
-            categoriesStored as string
-          ) as Category[];
-          setCategories(categoriesObject);
-        }
-      } catch (error) {
-        console.log(error);
-      }
-    }
-    loadCategories();
-  }, [props.visible]);
 
   return (
     <ModalContainer {...props}>
@@ -70,23 +41,21 @@ export function CategoriesModal({
             category={category}
             onPress={handlePress}
             active={category.active}
+            navigation={navigation}
           />
         ))}
+        <Button
+          activeOpacity={0.7}
+          style={{
+            position: "relative",
+            width: "auto",
+            height: 50,
+          }}
+          onPress={() => navigation.navigate("CreateCategory")}
+        >
+          <Ionicons name="add-outline" size={38} color="black" />
+        </Button>
       </CategoriesContainer>
     </ModalContainer>
   );
-}
-
-function updateCategories(categories: Category[]) {
-  try {
-    if (categories.length === 0) return;
-    const categoriesDeselected = categories.map((category) => {
-      if (category.active) return category;
-
-      return { ...category, selected: false };
-    });
-    AsyncStorage.setItem("categories", JSON.stringify(categoriesDeselected));
-  } catch (error) {
-    console.log(error);
-  }
 }

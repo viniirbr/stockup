@@ -2,16 +2,14 @@ import { ModalProps, Text, TextInput, View } from "react-native";
 import { ModalContainer } from "../../UI/Modal";
 import { PriceContainer, PriceInput } from "./styles";
 import { Button } from "../../UI/Button";
-import { Ionicons } from "@expo/vector-icons";
-import { Product } from "../../../interfaces/Product";
-import { useState } from "react";
+import { Product } from "../../../shared/interfaces/Product";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 interface Props extends ModalProps {
   product: Product;
   close: () => void;
-  price: number;
-  setPrice: React.Dispatch<React.SetStateAction<number>>;
+  price: string;
+  setPrice: React.Dispatch<React.SetStateAction<string>>;
 }
 
 export function EditLastPriceModal({
@@ -46,7 +44,7 @@ export function EditLastPriceModal({
           <PriceInput
             keyboardType="numeric"
             value={price.toString()}
-            onChangeText={(text) => setPrice(Number(text))}
+            onChangeText={(text) => setPrice(text)}
           />
         </PriceContainer>
         <Button

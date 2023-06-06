@@ -3,7 +3,6 @@ import styled from "styled-components/native";
 export const PriceContainer = styled.View`
   flex-direction: row;
   align-items: center;
-  justify-content: center;
   width: 20%;
   gap: 10px;
 `;
@@ -16,4 +15,17 @@ export const PriceInput = styled.TextInput`
   text-align: center;
   font-size: 24px;
   padding: 10px;
+`;
+
+export const OptionContainer = styled.TouchableOpacity`
+  width: 100%;
+  border: 2px black solid;
+  padding: 10px 5px;
+  margin-bottom: 16px;
+`;
+
+export const OptionText = styled.Text`
+  font-size: 18px;
+  text-align: center;
+  font-weight: bold;
 `;

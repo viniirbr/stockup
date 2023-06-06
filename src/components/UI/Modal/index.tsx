@@ -1,5 +1,5 @@
-import { Modal, ModalProps, StyleSheet, Text } from "react-native";
-import { CenteredView, ModalView } from "./styles";
+import { Modal, ModalProps, StyleSheet, Text, View } from "react-native";
+import { CenteredView, ChildrenContainer, ModalView } from "./styles";
 import { Title } from "../../Card/styles";
 import { Button } from "../Button";
 import { Ionicons } from "@expo/vector-icons";
@@ -22,7 +22,7 @@ export function ModalContainer({ title, close, children, ...props }: Props) {
           >
             <Ionicons name="close" size={32} />
           </Button>
-          {children}
+          <ChildrenContainer>{children}</ChildrenContainer>
         </ModalView>
       </CenteredView>
     </Modal>

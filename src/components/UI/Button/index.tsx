@@ -1,9 +1,7 @@
 import {
   ActivityIndicator,
   StyleProp,
-  Text,
   TextStyle,
-  TouchableOpacity,
   TouchableOpacityProps,
   ViewStyle,
 } from "react-native";

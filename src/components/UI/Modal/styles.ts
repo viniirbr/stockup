@@ -17,6 +17,11 @@ export const ModalView = styled.View`
   gap: 20px;
 `;
 
+export const ChildrenContainer = styled.View`
+  width: 100%;
+  padding: 0 10px;
+`;
+
 export const Title = styled.Text`
   font-size: 20px;
   font-weight: bold;

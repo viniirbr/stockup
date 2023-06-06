@@ -4,8 +4,9 @@ import { CategoryDropdown } from "../UI/CategoryDropdown";
 import { Button } from "../UI/Button";
 import { DrawerNavigationProp } from "@react-navigation/drawer";
 import { RootDrawerParamList } from "../../../App";
-import { useState } from "react";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useState, useEffect, useContext } from "react";
+import { RouteProp } from "@react-navigation/native";
+import { ProductsContext } from "../../contexts/ProductsContext";
 
 interface Props {
   navigation: DrawerNavigationProp<
@@ -13,44 +14,81 @@ interface Props {
     "CreateProduct",
     undefined
   >;
+  route: RouteProp<RootDrawerParamList, "CreateProduct">;
 }
 
-export function CreateProductForm({ navigation }: Props) {
-  const [name, setName] = useState("");
-  const [lastPrice, setLastPrice] = useState<string>("");
-  const [category, setCategory] = useState<string | null>(null);
+interface Form {
+  name: string;
+  lastPrice: string;
+}
+
+export function CreateProductForm({ navigation, route }: Props) {
+  const [form, setForm] = useState<Form>({
+    name: route.params?.product?.name || "",
+    lastPrice: route.params?.product?.lastPrice?.toString() || "",
+  });
+  const [category, setCategory] = useState<string | null>(
+    route.params?.product?.category || null
+  );
   const [loading, setLoading] = useState(false);
+  const [buttonDisabled, setButtonDisabled] = useState(true);
+  const { addProduct, editProduct } = useContext(ProductsContext);
+
+  useEffect(() => {
+    const unsubscribeFocus = navigation.addListener("focus", () => {
+      setForm({
+        name: route.params?.product?.name || "",
+        lastPrice: route.params?.product?.lastPrice?.toString() || "",
+      });
+      setCategory(route.params?.product?.category || null);
+    });
+
+    const unsubscribeBlur = navigation.addListener("blur", () => {
+      navigation.setParams({ product: undefined });
+      setForm({ name: "", lastPrice: "" });
+      setCategory(null);
+    });
+
+    return () => {
+      unsubscribeFocus();
+      unsubscribeBlur();
+    };
+  }, [route, navigation]);
+
+  useEffect(() => {
+    if (Object.values(form).every((value) => !!value === true) && category) {
+      setButtonDisabled(false);
+    } else {
+      setButtonDisabled(true);
+    }
+  }, [form, category]);
 
   async function handleSave() {
     try {
       setLoading(true);
-      const product = await AsyncStorage.getItem("products");
-      if (product) {
-        const productsObject = JSON.parse(product) as {
-          name: string;
-          color: string;
-        }[];
-        const productFound = productsObject.find(
-          (product) => product.name === name
-        );
-        if (productFound) {
-          console.log("Product already exists");
-          return;
-        }
-        await AsyncStorage.setItem(
-          "products",
-          JSON.stringify([
-            ...productsObject,
-            { name, lastPrice, category, checked: true },
-          ])
-        );
+      if (!category || !form.name || !form.lastPrice)
+        throw new Error("Missing fields");
+      if (!route.params?.product.id) {
+        const product = {
+          id: (Math.random() * 2000).toFixed(0),
+          name: form.name,
+          lastPrice: Number(form.lastPrice),
+          category,
+          checked: true,
+        };
+        await addProduct(product);
       } else {
-        await AsyncStorage.setItem(
-          "products",
-          JSON.stringify([{ name, lastPrice, category, checked: false }])
-        );
+        const product = {
+          id: route.params?.product.id as string,
+          name: form.name,
+          lastPrice: Number(form.lastPrice),
+          category,
+          checked: true,
+        };
+        await editProduct(product);
       }
-      await AsyncStorage.getItem("products");
+      setForm({ name: "", lastPrice: "" });
+      setCategory(null);
       navigation.navigate("Home");
     } catch (error) {
       console.log(error);
@@ -64,15 +102,17 @@ export function CreateProductForm({ navigation }: Props) {
       <Input
         label="Name"
         keyboardType="default"
-        value={name}
-        onChangeText={(text) => setName(text)}
+        value={form.name}
+        onChangeText={(text) => setForm((prev) => ({ ...prev, name: text }))}
       />
       <HorizontalView>
         <Input
           label="Last price"
           keyboardType="numeric"
-          value={lastPrice}
-          onChangeText={(text) => setLastPrice(text)}
+          value={form.lastPrice}
+          onChangeText={(text) =>
+            setForm((prev) => ({ ...prev, lastPrice: text }))
+          }
         />
         <CategoryDropdown
           navigation={navigation}
@@ -86,6 +126,7 @@ export function CreateProductForm({ navigation }: Props) {
         activeOpacity={0.7}
         onPress={handleSave}
         loading={loading}
+        disabled={buttonDisabled}
       />
     </Container>
   );
