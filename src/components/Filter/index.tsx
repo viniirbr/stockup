@@ -6,8 +6,7 @@ import { ToBuyText, ToBuyTouchable } from "./styles";
 import { Ionicons } from "@expo/vector-icons";
 import { useState, useEffect, useContext } from "react";
 import { FilterButton } from "../UI/FilterButton";
-import { ScrollView } from "react-native";
-import { View } from "react-native";
+import { View, Text, ScrollView } from "react-native";
 import { ProductsContext } from "../../contexts/ProductsContext";
 
 interface FilterProps {
@@ -32,11 +31,8 @@ export function Filter({ filters, handlePress, navigation }: FilterProps) {
     <View style={{ flex: 1 }}>
       <ScrollView
         contentContainerStyle={{
-          flexDirection: "row",
           alignItems: "center",
           gap: 10,
-          flexGrow: 1,
-          width: `${categories.length * 28}%`,
         }}
         horizontal
         scrollEnabled

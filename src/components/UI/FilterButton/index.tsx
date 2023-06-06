@@ -29,10 +29,9 @@ export function FilterButton({
         borderWidth: 2,
         borderColor: "#000",
         borderStyle: "solid",
-        maxWidth: 100,
+        width: 120,
         opacity: active ? 1 : 0.5,
         backgroundColor: selected ? category.color : "transparent",
-        width: "100%",
       }}
       textStyle={{ fontSize: 18, textAlign: "center", fontWeight: "bold" }}
       onPress={() => onPress(category.id)}
