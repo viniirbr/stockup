@@ -9,6 +9,7 @@ import { RootDrawerParamList } from "../../../App";
 import { RouteProp } from "@react-navigation/native";
 import { Category } from "../../shared/interfaces/Category";
 import { ProductsContext } from "../../contexts/ProductsContext";
+import Toast from "react-native-toast-message";
 
 interface Props {
   navigation: DrawerNavigationProp<
@@ -94,7 +95,15 @@ export function CreateCategoryForm({ route, navigation }: Props) {
               keyboardType="default"
               style={{ width: "60%" }}
               value={name}
-              onChangeText={(text) => setName(text)}
+              onChangeText={(text) =>
+                text.length < 9
+                  ? setName(text)
+                  : Toast.show({
+                      text1:
+                        "You can't use more than 9 characters. Make it small.",
+                      type: "info",
+                    })
+              }
             />
             <View style={{ width: "30%" }}>
               <ColorDropdown value={color} setValue={setColor} />
