@@ -1,9 +1,15 @@
 import styled from "styled-components/native";
 
-export const Container = styled.View`
-  padding: 100px 20px;
+export const Container = styled.KeyboardAvoidingView`
+  flex: 1;
+  justify-content: center;
+`;
+
+export const InnerContainer = styled.View`
   display: flex;
-  gap: 30px;
+  justify-content: space-between;
+  padding: 0 20px;
+  gap: 10px;
 `;
 
 export const HorizontalView = styled.View`

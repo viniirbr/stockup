@@ -1,8 +1,8 @@
 import { Input } from "../UI/Input";
-import { Container, HorizontalView } from "./styles";
+import { Container, HorizontalView, InnerContainer } from "./styles";
 import { Button } from "../UI/Button";
 import { ColorDropdown } from "../ColorsDropdown";
-import { View } from "react-native";
+import { View, TouchableWithoutFeedback, Keyboard } from "react-native";
 import { useState, useContext, useEffect } from "react";
 import { DrawerNavigationProp } from "@react-navigation/drawer";
 import { RootDrawerParamList } from "../../../App";
@@ -23,6 +23,8 @@ export function CreateCategoryForm({ route, navigation }: Props) {
   const [name, setName] = useState("");
   const [color, setColor] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [buttonDisabled, setButtonDisabled] = useState(true);
+
   const { addCategory, editCategory } = useContext(ProductsContext);
 
   useEffect(() => {
@@ -42,6 +44,14 @@ export function CreateCategoryForm({ route, navigation }: Props) {
       unsubscribeBlur();
     };
   }, [route, navigation]);
+
+  useEffect(() => {
+    if (name && color) {
+      setButtonDisabled(false);
+    } else {
+      setButtonDisabled(true);
+    }
+  }, [name, color]);
 
   async function handleSave() {
     try {
@@ -76,25 +86,30 @@ export function CreateCategoryForm({ route, navigation }: Props) {
 
   return (
     <Container>
-      <HorizontalView>
-        <Input
-          label="Name"
-          keyboardType="default"
-          style={{ width: "60%" }}
-          value={name}
-          onChangeText={(text) => setName(text)}
-        />
-        <View style={{ width: "30%" }}>
-          <ColorDropdown value={color} setValue={setColor} />
-        </View>
-      </HorizontalView>
-      <Button
-        text="Save"
-        style={{ backgroundColor: "#A0D8B3", marginTop: 200 }}
-        activeOpacity={0.7}
-        onPress={handleSave}
-        loading={loading}
-      />
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+        <InnerContainer>
+          <HorizontalView>
+            <Input
+              label="Name"
+              keyboardType="default"
+              style={{ width: "60%" }}
+              value={name}
+              onChangeText={(text) => setName(text)}
+            />
+            <View style={{ width: "30%" }}>
+              <ColorDropdown value={color} setValue={setColor} />
+            </View>
+          </HorizontalView>
+          <Button
+            text="Save"
+            style={{ backgroundColor: "#A0D8B3", marginTop: 200 }}
+            activeOpacity={0.7}
+            onPress={handleSave}
+            loading={loading}
+            disabled={buttonDisabled}
+          />
+        </InnerContainer>
+      </TouchableWithoutFeedback>
     </Container>
   );
 }

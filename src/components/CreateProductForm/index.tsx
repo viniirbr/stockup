@@ -1,5 +1,5 @@
 import { Input } from "../UI/Input";
-import { Container, HorizontalView } from "./styles";
+import { Container, HorizontalView, InnerContainer } from "./styles";
 import { CategoryDropdown } from "../UI/CategoryDropdown";
 import { Button } from "../UI/Button";
 import { DrawerNavigationProp } from "@react-navigation/drawer";
@@ -7,6 +7,7 @@ import { RootDrawerParamList } from "../../../App";
 import { useState, useEffect, useContext } from "react";
 import { RouteProp } from "@react-navigation/native";
 import { ProductsContext } from "../../contexts/ProductsContext";
+import { Platform, TouchableWithoutFeedback, Keyboard } from "react-native";
 
 interface Props {
   navigation: DrawerNavigationProp<
@@ -98,36 +99,42 @@ export function CreateProductForm({ navigation, route }: Props) {
   }
 
   return (
-    <Container>
-      <Input
-        label="Name"
-        keyboardType="default"
-        value={form.name}
-        onChangeText={(text) => setForm((prev) => ({ ...prev, name: text }))}
-      />
-      <HorizontalView>
-        <Input
-          label="Last price"
-          keyboardType="numeric"
-          value={form.lastPrice}
-          onChangeText={(text) =>
-            setForm((prev) => ({ ...prev, lastPrice: text }))
-          }
-        />
-        <CategoryDropdown
-          navigation={navigation}
-          value={category}
-          setValue={setCategory}
-        />
-      </HorizontalView>
-      <Button
-        text="Save"
-        style={{ backgroundColor: "#A0D8B3" }}
-        activeOpacity={0.7}
-        onPress={handleSave}
-        loading={loading}
-        disabled={buttonDisabled}
-      />
+    <Container behavior={Platform.OS === "ios" ? "padding" : "height"}>
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+        <InnerContainer>
+          <Input
+            label="Name"
+            keyboardType="default"
+            value={form.name}
+            onChangeText={(text) =>
+              setForm((prev) => ({ ...prev, name: text }))
+            }
+          />
+          <HorizontalView>
+            <Input
+              label="Last price"
+              keyboardType="numeric"
+              value={form.lastPrice}
+              onChangeText={(text) =>
+                setForm((prev) => ({ ...prev, lastPrice: text }))
+              }
+            />
+            <CategoryDropdown
+              navigation={navigation}
+              value={category}
+              setValue={setCategory}
+            />
+          </HorizontalView>
+          <Button
+            text="Save"
+            style={{ backgroundColor: "#A0D8B3" }}
+            activeOpacity={0.7}
+            onPress={handleSave}
+            loading={loading}
+            disabled={buttonDisabled}
+          />
+        </InnerContainer>
+      </TouchableWithoutFeedback>
     </Container>
   );
 }

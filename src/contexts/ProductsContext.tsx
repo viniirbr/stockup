@@ -17,6 +17,7 @@ interface ProductsContextData {
   editProduct: (productToEdit: Product) => Promise<void>;
   toggleCategoryActivate: (categoryId: number | string) => Promise<void>;
   editCategory: (categoryToEdit: Category) => Promise<void>;
+  clearShoppingList: (exceptions: number[]) => Promise<void>;
 }
 
 export const ProductsContext = createContext<ProductsContextData>({
@@ -31,6 +32,7 @@ export const ProductsContext = createContext<ProductsContextData>({
   editProduct: async () => {},
   toggleCategoryActivate: async () => {},
   editCategory: async () => {},
+  clearShoppingList: async () => {},
 });
 
 export const ProductsProvider: React.FC<{ children: ReactNode }> = ({
@@ -179,6 +181,26 @@ export const ProductsProvider: React.FC<{ children: ReactNode }> = ({
     }
   }
 
+  async function clearShoppingList(exceptions: number[]) {
+    const productsToChangeState = products.filter(
+      (product) =>
+        product.checked === false && !exceptions.includes(product.id as number)
+    );
+    const newStateProducts = products.map((product) => {
+      if (
+        productsToChangeState.map((product) => product.id).includes(product.id)
+      ) {
+        product.checked = true;
+      }
+      return product;
+    });
+    try {
+      await AsyncStorage.setItem("products", JSON.stringify(newStateProducts));
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
   return (
     <ProductsContext.Provider
       value={{
@@ -193,6 +215,7 @@ export const ProductsProvider: React.FC<{ children: ReactNode }> = ({
         editProduct,
         toggleCategoryActivate,
         editCategory,
+        clearShoppingList
       }}
     >
       {children}

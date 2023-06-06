@@ -8,6 +8,9 @@ import { DrawerScreenProps } from "@react-navigation/drawer";
 import { RootDrawerParamList } from "../../App";
 import { ProductsContext } from "../contexts/ProductsContext";
 import { useContext } from "react";
+import { EmptyProductList } from "../components/EmptyProductList";
+import { Button } from "../components/UI/Button";
+import { ProductsToCheckModal } from "../components/ProductsToCheckModal";
 
 type Props = DrawerScreenProps<RootDrawerParamList, "Home">;
 
@@ -16,6 +19,7 @@ export default function Home({ navigation }: Props) {
     useContext(ProductsContext);
   const [filters, setFilters] = useState<string[]>([]);
   const [toBuyActive, setToBuyActive] = useState<boolean>(false);
+  const [modalVisible, setModalVisible] = useState<boolean>(false);
 
   useEffect(() => {
     const unsubscribe = navigation.addListener("focus", () => {
@@ -59,6 +63,9 @@ export default function Home({ navigation }: Props) {
       <FlatList
         fadingEdgeLength={150}
         style={styles.flat}
+        contentContainerStyle={{
+          flexGrow: 1,
+        }}
         data={
           toBuyActive
             ? products
@@ -70,9 +77,28 @@ export default function Home({ navigation }: Props) {
         renderItem={(product) => (
           <Card product={product.item} navigation={navigation} />
         )}
-        ListEmptyComponent={() => <Text>Nothing to show</Text>}
+        ListEmptyComponent={
+          <EmptyProductList
+            filters={filters}
+            toBuyActive={toBuyActive}
+            navigation={navigation}
+          />
+        }
       />
       <StatusBar style="auto" />
+      {toBuyActive &&
+        products.filter((item) => item.checked === false).length !== 0 && (
+          <Button
+            text="Clear shopping list"
+            style={styles.clearListButton}
+            textStyle={{ fontSize: 16, color: "white" }}
+            onPress={() => setModalVisible(true)}
+          />
+        )}
+      <ProductsToCheckModal
+        close={() => setModalVisible(false)}
+        visible={modalVisible}
+      />
     </View>
   );
 }
@@ -93,5 +119,20 @@ const styles = StyleSheet.create({
     marginTop: 30,
     paddingHorizontal: 5,
     width: "100%",
+  },
+  clearListButton: {
+    position: "absolute",
+    bottom: 40,
+    right: 20,
+    backgroundColor: "green",
+    width: 200,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
   },
 });
