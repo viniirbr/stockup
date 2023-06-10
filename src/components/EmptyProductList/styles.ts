@@ -5,10 +5,7 @@ export const CenteredView = styled.View`
   align-items: center;
   flex: 1;
   margin-bottom: 200px;
-`;
-
-export const Container = styled.View`
-  align-items: center;
+  padding: 0 20px;
 `;
 
 export const EmptyText = styled.Text`

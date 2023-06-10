@@ -1,5 +1,10 @@
-import { ModalProps } from "react-native";
-import { CategoriesContainer, ModalContainer, ModalTitle } from "./styles";
+import { ModalProps, Text } from "react-native";
+import {
+  CategoriesContainer,
+  EmptyText,
+  ModalContainer,
+  ModalTitle,
+} from "./styles";
 import { Button } from "../UI/Button";
 import { Ionicons } from "@expo/vector-icons";
 import { useContext } from "react";
@@ -35,15 +40,19 @@ export function CategoriesModal({
       </Button>
       <ModalTitle>Select the categories you want to activate</ModalTitle>
       <CategoriesContainer>
-        {categories.map((category) => (
-          <FilterButton
-            key={category.name}
-            category={category}
-            onPress={handlePress}
-            active={category.active}
-            navigation={navigation}
-          />
-        ))}
+        {categories.length > 0 ? (
+          categories.map((category) => (
+            <FilterButton
+              key={category.name}
+              category={category}
+              onPress={handlePress}
+              active={category.active}
+              navigation={navigation}
+            />
+          ))
+        ) : (
+          <EmptyText>Start by adding a category</EmptyText>
+        )}
         <Button
           activeOpacity={0.7}
           style={{

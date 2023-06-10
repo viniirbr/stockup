@@ -1,5 +1,5 @@
-import { Text, View } from "react-native";
-import { CenteredView, Container, EmptyText } from "./styles";
+import { View } from "react-native";
+import { CenteredView, EmptyText } from "./styles";
 import { Button } from "../UI/Button";
 import { Ionicons } from "@expo/vector-icons";
 import { DrawerNavigationProp } from "@react-navigation/drawer";

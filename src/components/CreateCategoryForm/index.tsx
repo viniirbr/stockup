@@ -58,7 +58,7 @@ export function CreateCategoryForm({ route, navigation }: Props) {
     try {
       setLoading(true);
       if (!name || !color) throw new Error("Missing fields");
-      if (!route.params?.category.id) {
+      if (!route.params?.category) {
         const category: Category = {
           id: (Math.random() * 2000).toFixed(0),
           name,

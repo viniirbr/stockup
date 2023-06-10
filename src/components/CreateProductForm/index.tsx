@@ -1,7 +1,7 @@
 import { Input } from "../UI/Input";
+import { Button } from "../UI/Button";
 import { Container, HorizontalView, InnerContainer } from "./styles";
 import { CategoryDropdown } from "../UI/CategoryDropdown";
-import { Button } from "../UI/Button";
 import { DrawerNavigationProp } from "@react-navigation/drawer";
 import { RootDrawerParamList } from "../../../App";
 import { useState, useEffect, useContext } from "react";
@@ -69,7 +69,7 @@ export function CreateProductForm({ navigation, route }: Props) {
       setLoading(true);
       if (!category || !form.name || !form.lastPrice)
         throw new Error("Missing fields");
-      if (!route.params?.product.id) {
+      if (!route.params?.product?.id) {
         const product = {
           id: (Math.random() * 2000).toFixed(0),
           name: form.name,

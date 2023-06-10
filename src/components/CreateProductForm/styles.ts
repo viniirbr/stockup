@@ -7,7 +7,6 @@ export const Container = styled.KeyboardAvoidingView`
 
 export const InnerContainer = styled.View`
   display: flex;
-  justify-content: space-between;
   padding: 0 20px;
   gap: 10px;
 `;

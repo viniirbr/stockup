@@ -54,7 +54,8 @@ interface CategoryProps {
 export const CategoryView = styled.View<CategoryProps>`
   background: ${({ color }) => color};
   border-radius: 5px;
-  width: 20%;
+  width: 30%;
+  max-width: 80px;
   padding: 4px;
 `;
 

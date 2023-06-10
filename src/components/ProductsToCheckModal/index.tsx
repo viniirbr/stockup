@@ -37,7 +37,8 @@ export function ProductsToCheckModal({ close, ...props }: Props) {
       <FlatList
         data={productsToBuy}
         keyExtractor={(item) => item.id.toString()}
-        style={{ marginTop: 20 }}
+        style={{ marginTop: 20, height: 200 }}
+        scrollEnabled
         renderItem={({ item }) => (
           <ItemContainer
             activeOpacity={0.7}
