@@ -1,3 +1,4 @@
+import "react-native-gesture-handler";
 import { StatusBar } from "expo-status-bar";
 import { NavigationContainer } from "@react-navigation/native";
 import { createDrawerNavigator } from "@react-navigation/drawer";
@@ -23,7 +24,7 @@ export default function App() {
       <ProductsProvider>
         <NavigationContainer>
           <Drawer.Navigator
-            useLegacyImplementation={true}
+            useLegacyImplementation={false}
             initialRouteName="Home"
             backBehavior="history"
           >
